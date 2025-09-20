@@ -23,16 +23,20 @@ Once the server is up & running the default creds are: `user:password`
 
 ## Todo
 
-- [ ] Update readme to include usage information
+- [x] Update readme to include usage information
 - [ ] Clean up `serve.py` code
 - [ ] Update `serve.py` code to auto generate the necessary SSH keys
 - Add CLI args for: 
-	- [ x ] Specifying the port SSH will run on
-	- [ x ] Specify the location log files will be saved to
+	- [x] Specifying the port SSH will run on
+	- [x] Specify the location log files will be saved to
 - [ ] Add example usage of utilizing Dockerfiles to deploy more realistic honeypots (EX: Deploying additional directories & files)
 - [ ] Add automated python script that'll auto attack SSH honeypots on specified subnet to simulate attacker. CTF-style questions will then be asked based on these commands ran.
 - [ ] Possible web interface for viewing active SSH sessions & logs?
 - [ ] Implement check to ensure running with root privileges, otherwise exit to avoid causing errors
+- [x] Implement dockerfile capability for deploying breadcrumbs
+
+## DockerFile Breadcrumb Example Usage
+
 
 
 ## Common Issues

@@ -158,20 +158,39 @@ def deployTmpContainer():
     # Generate random docker container name
     alphabet = string.ascii_letters + string.digits
     containerName = ''.join(random.choice(alphabet) for _ in range(10))
+    
     print(f"[+] Spawning container {containerName}")
+    
+    # Deploy container based on if dockerfile was passed
+    if args.docker_file is not None:
+        log.msg(f"[+] Building & deploying docker file: {args.docker_file}...")
+        client = docker.from_env()
 
-
-    client = docker.from_env()
-    client.images.pull("ubuntu:latest")
-    container = client.containers.run(
-            "ubuntu:latest",
+        image, logs = client.images.build(
+            path=".",
+            dockerfile=args.docker_file,
+            tag=containerName.lower(), # fun fact: Docker image tags must be lowercase so this caused me major issues first time around 
+        )
+      
+        container = client.containers.run(
+            containerName.lower(),
             command="bash",
-            name=containerName,
             tty=True,
-            detach=True,
-            )
-    print("[+] Tmp conainer started!")
-    return container, containerName
+            detach=True
+        )
+        return container, containerName
+    else:
+        client = docker.from_env()
+        client.images.pull("ubuntu:latest")
+        container = client.containers.run(
+                "ubuntu:latest",
+                command="bash",
+                name=containerName,
+                tty=True,
+                detach=True,
+                )
+        print("[+] Tmp conainer started!")
+        return container, containerName
 
 
 @implementer(session.ISession, session.ISessionSetEnv)
@@ -231,6 +250,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--port", help="Port to run SSH server on", required=True, type=int)
     parser.add_argument("-l", "--log", help="Directory to store logs. Log file name will be appended on", required=True)
+    parser.add_argument("-d", "--docker-file", help="Testing", required=False)
     args = parser.parse_args()
 
     print(f"[+] SSH server will run on port {args.port}")
