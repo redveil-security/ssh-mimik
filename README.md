@@ -34,10 +34,39 @@ Once the server is up & running the default creds are: `user:password`
 - [ ] Possible web interface for viewing active SSH sessions & logs?
 - [ ] Implement check to ensure running with root privileges, otherwise exit to avoid causing errors
 - [x] Implement dockerfile capability for deploying breadcrumbs
+	- [ ] Implement better error handling with Dockerfile implementation
+	- [ ] Document this feature better 
+
 
 ## DockerFile Breadcrumb Example Usage
 
+### Usage
 
+Since Docker containers are deployed once a successful SSH connection is made, you can use custom DockerFiles to help deploy additional breadcrumbs when an attacker connects.
+
+For example, say you wanted to lead the adversary down a path of deception. You could have the following DockerFile:
+
+```
+FROM ubuntu:20.04
+
+WORKDIR /opt/scripts
+
+COPY ssh_login.sh /opt/scripts/logmein.sh
+
+RUN chmod +x /opt/scripts/logmein.sh
+```
+
+Then on our local system, the content of our `ssh_login.sh` would be:
+
+```
+ssh -i "IDENTITY.pem" 192.168.2.1
+```
+
+This will create a Docker container and copy a Bash SSH login script to the container's `/opt/scripts/` directory. Ideally, you'd also transfer the `IDENTITY.pem` file & standup a server with an IP of `192.168.2.1` to lead an attacker down a further path of deception and confusion.
+
+### Errors
+
+If you pass a Dockerfile that doesn't exist, the program won't currently exit & will continue running but will log a message saying: `[!] Fatal error! Dockerfile was passed but doesn't exist: <DockerFile Name>!`. But on the client-side, you'll get an error saying `shell request failed on channel 0` after attempting to authenticate.
 
 ## Common Issues
 

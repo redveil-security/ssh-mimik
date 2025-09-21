@@ -23,7 +23,7 @@ import json
 import logging
 import argparse
 from datetime import datetime
-
+import os
 
 #log.startLogging(sys.stderr)
 
@@ -163,22 +163,27 @@ def deployTmpContainer():
     
     # Deploy container based on if dockerfile was passed
     if args.docker_file is not None:
-        log.msg(f"[+] Building & deploying docker file: {args.docker_file}...")
-        client = docker.from_env()
+        # Ensure file exists
+        if os.path.isfile(args.docker_file):
+            log.msg(f"[+] Building & deploying docker file: {args.docker_file}...")
+            client = docker.from_env()
 
-        image, logs = client.images.build(
-            path=".",
-            dockerfile=args.docker_file,
-            tag=containerName.lower(), # fun fact: Docker image tags must be lowercase so this caused me major issues first time around 
-        )
+            image, logs = client.images.build(
+                path=".",
+                dockerfile=args.docker_file,
+                tag=containerName.lower(), # fun fact: Docker image tags must be lowercase so this caused me major issues first time around 
+            )
       
-        container = client.containers.run(
-            containerName.lower(),
-            command="bash",
-            tty=True,
-            detach=True
-        )
-        return container, containerName
+            container = client.containers.run(
+                containerName.lower(),
+                command="bash",
+                tty=True,
+                detach=True
+            )
+            return container, containerName
+        else:
+            log.msg(f"[!] Fatal error! Dockerfile was passed but doesn't exist: {args.docker_file}!")
+            quit()
     else:
         client = docker.from_env()
         client.images.pull("ubuntu:latest")
