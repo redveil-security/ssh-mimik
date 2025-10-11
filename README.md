@@ -35,7 +35,7 @@ Once the server is up & running the default creds are: `user:password`
 - [x] Implement check to ensure running with root privileges, otherwise exit to avoid causing errors
 - [x] Implement dockerfile capability for deploying breadcrumbs
 	- [ ] Implement better error handling with Dockerfile implementation
-	- [ ] Document this feature better 
+	- [x] Document this feature better 
 
 
 ## DockerFile Breadcrumb Example Usage
