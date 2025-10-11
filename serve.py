@@ -195,7 +195,6 @@ def deployTmpContainer():
         else:
             log.msg(f"[!] Fatal error! Dockerfile was passed but doesn't exist: {args.docker_file}!")
             quit()
-            #sys.exit(f"[!] Fatal error! DockerFile was passed but doesn't exist: {args.docker_file}!")
     else:
         client = docker.from_env()
         client.images.pull("ubuntu:latest")
@@ -275,7 +274,10 @@ if __name__ == "__main__":
     
 
     if args.docker_file is not None:
-        print(f"[+] Deploying container based off Dockerfile passed: {args.docker_file} on {args.port}")
+        if os.path.isfile(args.docker_file): 
+            print(f"[+] Deploying container based off Dockerfile passed: {args.docker_file} on {args.port}")
+        else:
+            sys.exit(f"[!] Dockerfile passed doesn't exist: {args.docker_file}!")
     else:
         print(f"[+] No Dockerfile passed. Running vanilla config on {args.port}")   
     #print(f"[+] SSH server will run on port {args.port}")

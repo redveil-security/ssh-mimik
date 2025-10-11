@@ -47,9 +47,15 @@ ssh -i "IDENTITY.pem" 192.168.2.1
 
 This will create a Docker container and copy a Bash SSH login script to the container's `/opt/scripts/` directory. Ideally, you'd also transfer the `IDENTITY.pem` file & standup a server with an IP of `192.168.2.1` to lead an attacker down a further path of deception and confusion.
 
+Then you'd run the honeypot:
+
+`sudo python3 serve.py -p 22 -l . -d examples/DockerFile`
+
 ### Errors
 
-If you pass a Dockerfile that doesn't exist, the program won't currently exit & will continue running but will log a message saying: `[!] Fatal error! Dockerfile was passed but doesn't exist: <DockerFile Name>!`. But on the client-side, you'll get an error saying `shell request failed on channel 0` after attempting to authenticate.
+If you pass a DockerFile that doesn't exist, the program will exit with an error indicating so.
+
+~~If you pass a DockerFile that doesn't exist, the program won't currently exit & will continue running but will log a message saying: `[!] Fatal error! DockerFile was passed but doesn't exist: <DockerFile Name>!`. But on the client-side, you'll get an error saying `shell request failed on channel 0` after attempting to authenticate.~~
 
 ## Common Issues
 
@@ -67,12 +73,12 @@ Script immediately exiting without starting server:
 - Add CLI args for: 
 	- [x] Specifying the port SSH will run on
 	- [x] Specify the location log files will be saved to
-- [x] Add example usage of utilizing Dockerfiles to deploy more realistic honeypots (EX: Deploying additional directories & files)
+- [x] Add example usage of utilizing DockerFiles to deploy more realistic honeypots (EX: Deploying additional directories & files)
 - [ ] Add automated python script that'll auto attack SSH honeypots on specified subnet to simulate attacker. CTF-style questions will then be asked based on these commands ran.
 - [ ] Possible web interface for viewing active SSH sessions & logs?
 - [x] Implement check to ensure running with root privileges, otherwise exit to avoid causing errors
-- [x] Implement dockerfile capability for deploying breadcrumbs
-	- [ ] Implement better error handling with Dockerfile implementation
+- [x] Implement DockerFile capability for deploying breadcrumbs
+	- [ ] Implement better error handling with DockerFile implementation
 	- [x] Document this feature better 
 
 
