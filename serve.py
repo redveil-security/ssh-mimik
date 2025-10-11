@@ -165,12 +165,23 @@ def deployTmpContainer():
     if args.docker_file is not None:
         # Ensure file exists
         if os.path.isfile(args.docker_file):
+            # TODO Add logic in case user provides directory instead of passing DockerFile in same directory (/examples/DockerFile instead of DockerFile)
+            # assume arg passed is: -d DockerFile & located in same working dir script is ran from
+            path = "."
+            dockerFileName = args.docker_file
+            # Check if arg passed for dockerfile is in aother dir (EX: -d examples/DockerFile)
+            if "/" in args.docker_file:
+                path = "/".join(args.docker_file.split("/")[:-1]) # just the directory
+                dockerFileName = args.docker_file.split("/")[-1] # just the DockerFile name
+            
             log.msg(f"[+] Building & deploying docker file: {args.docker_file}...")
             client = docker.from_env()
-
+            
             image, logs = client.images.build(
-                path=".",
-                dockerfile=args.docker_file,
+                #path=".",
+                #dockerfile=args.docker_file,
+                path=path,
+                dockerfile=dockerFileName,
                 tag=containerName.lower(), # fun fact: Docker image tags must be lowercase so this caused me major issues first time around 
             )
       
@@ -184,6 +195,7 @@ def deployTmpContainer():
         else:
             log.msg(f"[!] Fatal error! Dockerfile was passed but doesn't exist: {args.docker_file}!")
             quit()
+            #sys.exit(f"[!] Fatal error! DockerFile was passed but doesn't exist: {args.docker_file}!")
     else:
         client = docker.from_env()
         client.images.pull("ubuntu:latest")
@@ -260,8 +272,13 @@ if __name__ == "__main__":
     parser.add_argument("-l", "--log", help="Directory to store logs. Log file name will be appended on", required=True)
     parser.add_argument("-d", "--docker-file", help="Testing", required=False)
     args = parser.parse_args()
+    
 
-    print(f"[+] SSH server will run on port {args.port}")
+    if args.docker_file is not None:
+        print(f"[+] Deploying container based off Dockerfile passed: {args.docker_file} on {args.port}")
+    else:
+        print(f"[+] No Dockerfile passed. Running vanilla config on {args.port}")   
+    #print(f"[+] SSH server will run on port {args.port}")
 
     logfile = open(args.log + "/ssh.json", "a")
     observer = JSONLogObserver(logfile)

@@ -1,0 +1,11 @@
+FROM ubuntu:20.04
+
+WORKDIR /opt/scripts
+
+COPY ssh_login.sh /opt/scripts/logmein.sh
+
+RUN chmod +x /opt/scripts/logmein.sh
+
+RUN touch -a -m -t 201512180130.09 /opt/scripts/logmein.sh 
+
+WORKDIR /
