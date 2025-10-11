@@ -252,6 +252,9 @@ class ExampleFactory(factory.SSHFactory):
 
 # Usage: sudo python3 serve.py -p 22 -l /splunk/log/folder
 if __name__ == "__main__":
+    # Ensure running as root
+    if os.geteuid() != 0:
+        sys.exit("[!] Must run script as root!")
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--port", help="Port to run SSH server on", required=True, type=int)
     parser.add_argument("-l", "--log", help="Directory to store logs. Log file name will be appended on", required=True)
