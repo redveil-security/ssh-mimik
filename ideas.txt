@@ -1,4 +1,0 @@
-# Ideas
-
-* DockerFile that deploys flags/keys to the CTF in various directories on the honeypot box. Or even just rigs certain binaries/bash aliases with custom ones that will display the flag if a certain binary is ran for enumeration purposes
-* Auto-fill logs with attack script
