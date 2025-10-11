@@ -78,7 +78,7 @@ Script immediately exiting without starting server:
 - [ ] Possible web interface for viewing active SSH sessions & logs?
 - [x] Implement check to ensure running with root privileges, otherwise exit to avoid causing errors
 - [x] Implement DockerFile capability for deploying breadcrumbs
-	- [ ] Implement better error handling with DockerFile implementation
+	- [x] Implement better error handling with DockerFile implementation
 	- [x] Document this feature better 
 
 
