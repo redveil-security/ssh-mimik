@@ -23,7 +23,7 @@ import json
 import logging
 import argparse
 from datetime import datetime
-
+import os
 
 #log.startLogging(sys.stderr)
 
@@ -158,20 +158,55 @@ def deployTmpContainer():
     # Generate random docker container name
     alphabet = string.ascii_letters + string.digits
     containerName = ''.join(random.choice(alphabet) for _ in range(10))
+    
     print(f"[+] Spawning container {containerName}")
-
-
-    client = docker.from_env()
-    client.images.pull("ubuntu:latest")
-    container = client.containers.run(
-            "ubuntu:latest",
-            command="bash",
-            name=containerName,
-            tty=True,
-            detach=True,
+    
+    # Deploy container based on if dockerfile was passed
+    if args.docker_file is not None:
+        # Ensure file exists
+        if os.path.isfile(args.docker_file):
+            # TODO Add logic in case user provides directory instead of passing DockerFile in same directory (/examples/DockerFile instead of DockerFile)
+            # assume arg passed is: -d DockerFile & located in same working dir script is ran from
+            path = "."
+            dockerFileName = args.docker_file
+            # Check if arg passed for dockerfile is in aother dir (EX: -d examples/DockerFile)
+            if "/" in args.docker_file:
+                path = "/".join(args.docker_file.split("/")[:-1]) # just the directory
+                dockerFileName = args.docker_file.split("/")[-1] # just the DockerFile name
+            
+            log.msg(f"[+] Building & deploying docker file: {args.docker_file}...")
+            client = docker.from_env()
+            
+            image, logs = client.images.build(
+                #path=".",
+                #dockerfile=args.docker_file,
+                path=path,
+                dockerfile=dockerFileName,
+                tag=containerName.lower(), # fun fact: Docker image tags must be lowercase so this caused me major issues first time around 
             )
-    print("[+] Tmp conainer started!")
-    return container, containerName
+      
+            container = client.containers.run(
+                containerName.lower(),
+                command="bash",
+                tty=True,
+                detach=True
+            )
+            return container, containerName
+        else:
+            log.msg(f"[!] Fatal error! Dockerfile was passed but doesn't exist: {args.docker_file}!")
+            quit()
+    else:
+        client = docker.from_env()
+        client.images.pull("ubuntu:latest")
+        container = client.containers.run(
+                "ubuntu:latest",
+                command="bash",
+                name=containerName,
+                tty=True,
+                detach=True,
+                )
+        print("[+] Tmp conainer started!")
+        return container, containerName
 
 
 @implementer(session.ISession, session.ISessionSetEnv)
@@ -228,12 +263,24 @@ class ExampleFactory(factory.SSHFactory):
 
 # Usage: sudo python3 serve.py -p 22 -l /splunk/log/folder
 if __name__ == "__main__":
+    # Ensure running as root
+    if os.geteuid() != 0:
+        sys.exit("[!] Must run script as root!")
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--port", help="Port to run SSH server on", required=True, type=int)
     parser.add_argument("-l", "--log", help="Directory to store logs. Log file name will be appended on", required=True)
+    parser.add_argument("-d", "--docker-file", help="Testing", required=False)
     args = parser.parse_args()
+    
 
-    print(f"[+] SSH server will run on port {args.port}")
+    if args.docker_file is not None:
+        if os.path.isfile(args.docker_file): 
+            print(f"[+] Deploying container based off Dockerfile passed: {args.docker_file} on {args.port}")
+        else:
+            sys.exit(f"[!] Dockerfile passed doesn't exist: {args.docker_file}!")
+    else:
+        print(f"[+] No Dockerfile passed. Running vanilla config on {args.port}")   
+    #print(f"[+] SSH server will run on port {args.port}")
 
     logfile = open(args.log + "/ssh.json", "a")
     observer = JSONLogObserver(logfile)
