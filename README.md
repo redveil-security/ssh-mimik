@@ -4,6 +4,10 @@ SSH honeypot utilizing ephemeral Docker containers.
 
 # Usage
 
+## Installation 
+
+Ensure that Docker is installed & the service is enabled & running on the machine you're running this on, otherwise the Docker containers won't be able to be spun up. See the [docker installation instruction page](https://docs.docker.com/engine/install/)
+
 `git clone https://github.com/1d8/ssh-mimik`
 
 `pip3 install -r requirements.txt`
@@ -80,5 +84,4 @@ Script immediately exiting without starting server:
 - [x] Implement DockerFile capability for deploying breadcrumbs
 	- [x] Implement better error handling with DockerFile implementation
 	- [x] Document this feature better 
-
 

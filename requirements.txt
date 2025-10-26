@@ -10,4 +10,4 @@ Twisted==24.11.0
 typing_extensions==4.13.1
 zope.interface==7.2
 docker==7.1.0
-cryptography==cryptography==3.4.8
+cryptography==3.4.8
