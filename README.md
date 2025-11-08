@@ -8,7 +8,7 @@ SSH honeypot utilizing ephemeral Docker containers.
 
 Ensure that Docker is installed & the service is enabled & running on the machine you're running this on, otherwise the Docker containers won't be able to be spun up. See the [docker installation instruction page](https://docs.docker.com/engine/install/)
 
-`git clone https://github.com/1d8/ssh-mimik`
+`git clone https://github.com/redveil-security/ssh-mimik.git`
 
 `pip3 install -r requirements.txt`
 
